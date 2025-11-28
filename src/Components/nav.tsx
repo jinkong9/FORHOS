@@ -1,16 +1,8 @@
 import { useNavigate, Link } from "react-router-dom";
-import Button from "../../Components/Button";
+import Button from "./Button";
 
 export default function Nav() {
   const navigate = useNavigate();
-
-  const goList = () => {
-    navigate("/hospital/list");
-  };
-
-  const goInfo = () => {
-    navigate("/info");
-  };
 
   const goMain = () => {
     navigate("/");
