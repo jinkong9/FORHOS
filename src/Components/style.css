@@ -1,0 +1,11 @@
+.input-base {
+  @apply border-2 border-slate-300
+    w-40 h-10 px-3 rounded-2xl
+    transition-all duration-200 ease-in-out;
+}
+
+.input-focus {
+  @apply focus:border-violet-700 focus:shadow-md;
+}
+
+/* @apply border-2 border-slate-300 transition-all shadow-lg duration-200 ease-in-out w-40 h-10 px-3 rounded-2xl; */

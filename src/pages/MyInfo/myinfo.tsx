@@ -1,3 +1,11 @@
+import Form from "./form";
+
 export default function Myinfo() {
-  return <div>Myinif</div>;
+  return (
+    <>
+      <div className="h-screen w-full flex justify-center items-center">
+        <Form />
+      </div>
+    </>
+  );
 }
