@@ -6,12 +6,9 @@ interface Button {
   className?: string;
 }
 
-export default function Button({ children, onClick, className }: Button) {
+export default function NavButton({ children, onClick, className }: Button) {
   return (
-    <button
-      onClick={onClick}
-      className={`w-20 h-10 rounded-2xl cursor-pointer hover:scale-105 ${className}`}
-    >
+    <button onClick={onClick} className={`w-20 h-10 rounded-2xl cursor-pointer hover:scale-105 ${className}`}>
       {children}
     </button>
   );

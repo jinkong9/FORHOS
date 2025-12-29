@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import Button from "./Button";
+import NavButton from "./NavButton";
 
 export default function Nav() {
   const navigate = useNavigate();
@@ -12,8 +12,8 @@ export default function Nav() {
     navigate("/hospital/register", { replace: true });
   };
 
-  const GoTest = () => {
-    navigate("/hospital/done");
+  const GoLogin = () => {
+    navigate("/login");
   };
 
   return (
@@ -28,12 +28,12 @@ export default function Nav() {
         <Link to="/hospital/list" className="text-center text-xl cursor-pointer hover:scale-105">
           LIST
         </Link>
-        <Button onClick={GoTest} className="border border-gray-500 bg-white">
+        <NavButton onClick={GoLogin} className="border border-gray-500 bg-white">
           Login
-        </Button>
-        <Button onClick={GoRegister} className=" mr-10 text-white bg-[#5D5A88]">
+        </NavButton>
+        <NavButton onClick={GoRegister} className=" mr-10 text-white bg-[#5D5A88]">
           등록하기
-        </Button>
+        </NavButton>
       </div>
     </div>
   );

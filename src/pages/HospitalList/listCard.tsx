@@ -2,17 +2,10 @@ import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import type { Hospital } from "./listSlide";
-import { useNavigate } from "react-router-dom";
 
 interface Hosprops {
   hospital: Hospital;
 }
-
-const navigate = useNavigate();
-
-const GoRegister = () => {
-  navigate("/hospital/register");
-};
 
 export default function HospitalCard({ hospital }: Hosprops) {
   return (
