@@ -10,6 +10,7 @@ import { NotFoundPage } from "@/pages/not-found/ui/NotFoundPage";
 import { QueueDonePage } from "@/pages/queue-done/ui/QueueDonePage";
 import { QueueInputPage } from "@/pages/queue-input/ui/QueueInputPage";
 import { QueueStatusPage } from "@/pages/queue-status/ui/QueueStatusPage";
+import { SignupPage } from "@/pages/signup/ui/SignupPage";
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
     children: [
       { path: routes.home, element: <HomePage /> },
       { path: routes.login, element: <LoginPage /> },
+      { path: routes.signup, element: <SignupPage /> },
       { path: routes.myInfo, element: <MyInfoPage /> },
       { path: routes.hospitalList, element: <HospitalListPage /> },
       { path: routes.hospitalRegister, element: <HospitalRegisterPage /> },

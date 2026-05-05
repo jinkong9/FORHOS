@@ -44,7 +44,13 @@ export function LoginForm() {
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-        <Field label="이메일" type="email" placeholder="forhos@example.com" error={errors.email?.message} {...register("email")} />
+        <Field
+          label="이메일"
+          type="email"
+          placeholder="forhos@example.com"
+          error={errors.email?.message}
+          {...register("email")}
+        />
         <Field
           label="비밀번호"
           type="password"
@@ -58,9 +64,9 @@ export function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-600">
-        처음 방문하셨나요?{" "}
-        <Link className="font-semibold text-teal-700 hover:text-teal-800" to={routes.myInfo}>
-          내 정보 등록
+        아직 계정이 없으신가요?{" "}
+        <Link className="font-semibold text-teal-700 hover:text-teal-800" to={routes.signup}>
+          회원가입
         </Link>
       </p>
     </Card>
