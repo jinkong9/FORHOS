@@ -16,7 +16,7 @@ export type RegisterMemberResponse = {
 };
 
 export async function registerMember(request: RegisterMemberRequest) {
-  const { data } = await apiClient.post<RegisterMemberResponse>("/member/register", request);
+  const { data } = await apiClient.post<RegisterMemberResponse>("/members/register", request);
 
   return data;
 }
