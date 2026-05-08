@@ -15,8 +15,25 @@ export type RegisterMemberResponse = {
   phone: string;
 };
 
+export type LoginMemberRequest = {
+  email : string;
+  password : string;
+}
+
+export type LoginMemberResponse = {
+  grantType : string;
+  accessToken : string;
+  refreshToken : string;
+}
+
 export async function registerMember(request: RegisterMemberRequest) {
-  const { data } = await apiClient.post<RegisterMemberResponse>("/member/register", request);
+  const { data } = await apiClient.post<RegisterMemberResponse>("/members/register", request);
+
+  return data;
+}
+
+export async function loginMember(request : LoginMemberRequest) {
+  const {data} = await apiClient.post<LoginMemberResponse>("/members/login", request);
 
   return data;
 }
