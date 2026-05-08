@@ -3,6 +3,9 @@ import { NavLink } from "react-router-dom";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { cn } from "@/shared/lib/cn";
+import { useEffect, useState } from "react";
+import { getMyName } from "@/features/auth/api/myinfoApi";
+import { AxiosError } from "axios";
 
 const navItems = [
   { to: routes.hospitalList, label: "병원 찾기" },
@@ -11,6 +14,23 @@ const navItems = [
 ];
 
 export function AppHeader() {
+
+const [myname, setMyname] = useState("");
+
+  useEffect(() => {
+    const handelName = async() => {
+    try {
+      const data = await getMyName();
+    setMyname(data?.name);
+    } catch (err) {
+      if(err instanceof AxiosError) {
+        return;
+      }
+    }    
+  }
+  handelName();    
+  }, [])
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
@@ -39,6 +59,7 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {myname ? <p className="font-bold">{myname}님 환영합니다.</p> : null}
           <NavLink to={routes.login}>
             <Button variant="ghost" className="hidden px-3 md:inline-flex">
               <LogIn className="size-4" aria-hidden="true" />
