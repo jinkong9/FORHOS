@@ -13,7 +13,7 @@ const strengths = [
 ];
 
 export function HomePage() {
-  const totalWaiting = hospitals.reduce((sum, hospital) => sum + hospital.waitingCount, 0);
+  const totalWaiting = hospitals.reduce((sum, hospital) => sum + hospital.waitingPeople, 0);
 
 
   return (

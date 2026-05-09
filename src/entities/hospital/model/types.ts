@@ -1,14 +1,10 @@
-export type HospitalSpecialty = "내과" | "소아청소년과" | "정형외과" | "이비인후과" | "치과" | "피부과";
-
 export type Hospital = {
-  id: string;
+  id: number;
   name: string;
-  specialty: HospitalSpecialty;
-  address: string;
-  phone: string;
-  waitingCount: number;
-  estimatedMinutes: number;
-  openStatus: "진료중" | "접수마감";
+  addr: string;
+  number: string;
+  openStatus: boolean;
+  waitingPeople: number;
+  waitingTime: number;
   rating: number;
-  accentColor: string;
 };

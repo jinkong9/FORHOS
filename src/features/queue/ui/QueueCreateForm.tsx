@@ -27,7 +27,7 @@ export function QueueCreateForm() {
   } = useForm<QueueFormValues>({
     resolver: zodResolver(queueSchema),
     defaultValues: {
-      hospitalId: hospitals[0]?.id ?? "",
+      hospitalId: hospitals[0]?.id.toString() ?? "",
       patientName: "",
       symptom: "",
       visitType: "first",
@@ -54,7 +54,7 @@ export function QueueCreateForm() {
         <SelectField
           label="방문 병원"
           error={errors.hospitalId?.message}
-          options={hospitals.map((hospital) => ({ label: `${hospital.name} · ${hospital.specialty}`, value: hospital.id }))}
+          options={hospitals.map((hospital) => ({ label: hospital.name, value: hospital.id.toString() }))}
           {...register("hospitalId")}
         />
         <Field label="환자 이름" placeholder="홍길동" error={errors.patientName?.message} {...register("patientName")} />
@@ -69,7 +69,7 @@ export function QueueCreateForm() {
         />
         <TextareaField
           label="증상 메모"
-          placeholder="예: 목이 붓고 열이 있어요."
+          placeholder="목이 붓고 열이 있어요."
           error={errors.symptom?.message}
           {...register("symptom")}
         />

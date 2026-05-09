@@ -1,11 +1,14 @@
 import { apiClient } from "@/shared/api/apiClient";
 
 export type RegisterMemberRequest = {
-  name: string;
   email: string;
-  phone: string;
   password: string;
-  passwordConfirm: string;
+  name: string;
+  age: number;
+  phone: string;
+  gender: string;
+  region?: string;
+  extra?: string;
 };
 
 export type RegisterMemberResponse = {
@@ -13,6 +16,10 @@ export type RegisterMemberResponse = {
   name: string;
   email: string;
   phone: string;
+  age?: number;
+  gender?: string;
+  region?: string;
+  extra?: string;
 };
 
 export type LoginMemberRequest = {
