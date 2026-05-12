@@ -28,6 +28,15 @@ export type ReceptionResponse = {
   canceledTime: string | null;
 };
 
+export type ReceptionStatusResponse = {
+  receptionId: number;
+  hospitalId: number;
+  hospitalName: string;
+  status: ReceptionQueueStatus;
+  queueNumber: number;
+  waitingCount: number;
+};
+
 export async function createReception(request: ReceptionCreateRequest) {
   const { data } = await apiClient.post<ReceptionResponse>("/reception", request);
 
@@ -35,7 +44,13 @@ export async function createReception(request: ReceptionCreateRequest) {
 }
 
 export async function getTodayReceptions(hospitalId: number) {
-  const { data } = await apiClient.get<ReceptionResponse[]>(`/reception/hospital/${hospitalId}/tody`);
+  const { data } = await apiClient.get<ReceptionResponse[]>(`/reception/hospital/${hospitalId}/today`);
+
+  return data;
+}
+
+export async function getReceptionStatus(receptionId: number) {
+  const { data } = await apiClient.get<ReceptionStatusResponse>(`/reception/hospital/${receptionId}/status`);
 
   return data;
 }
