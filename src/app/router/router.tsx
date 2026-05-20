@@ -11,6 +11,7 @@ import { QueueDonePage } from "@/pages/queue-done/ui/QueueDonePage";
 import { QueueInputPage } from "@/pages/queue-input/ui/QueueInputPage";
 import { QueueStatusPage } from "@/pages/queue-status/ui/QueueStatusPage";
 import { SignupPage } from "@/pages/signup/ui/SignupPage";
+import { MyReceptionsPage } from "@/pages/my-receptions/ui/MyReceptionsPage";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { path: routes.queueInput, element: <QueueInputPage /> },
       { path: routes.queueDone, element: <QueueDonePage /> },
       { path: routes.queueStatus, element: <QueueStatusPage /> },
+      { path: routes.myReceptions, element: <MyReceptionsPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

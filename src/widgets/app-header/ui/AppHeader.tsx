@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/Button";
 const navItems = [
   { to: routes.hospitalList, label: "병원 찾기" },
   { to: routes.queueStatus, label: "대기 현황" },
+  { to: routes.myReceptions, label: "내 접수" },
   { to: routes.myInfo, label: "내 정보" },
 ];
 

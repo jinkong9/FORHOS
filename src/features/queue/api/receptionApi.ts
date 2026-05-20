@@ -54,3 +54,15 @@ export async function getReceptionStatus(receptionId: number) {
 
   return data;
 }
+
+export async function getMyReceptions() {
+  const { data } = await apiClient.get<ReceptionResponse[]>("/reception/me");
+
+  return data;
+}
+
+export async function cancelReception(receptionId: number) {
+  const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/cancle`);
+
+  return data;
+}

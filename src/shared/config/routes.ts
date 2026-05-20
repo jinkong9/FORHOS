@@ -8,4 +8,5 @@ export const routes = {
   queueInput: "/hospital/input",
   queueDone: "/hospital/done",
   queueStatus: "/hospital/status",
+  myReceptions: "/reception/me",
 } as const;
