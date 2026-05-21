@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { HospitalCard } from "@/entities/hospital/ui/HospitalCard";
 import { hospitalList } from "@/features/auth/api/hospitalListApi";
+import { Button } from "@/shared/ui/Button";
 import { Field, SelectField } from "@/shared/ui/Field";
 
 const statusOptions = [
@@ -20,6 +21,8 @@ export function HospitalSearch() {
     data: hospitals = [],
     isLoading,
     isError,
+    isFetching,
+    refetch,
   } = useQuery({
     queryKey: ["hospitals"],
     queryFn: hospitalList,
@@ -73,7 +76,11 @@ export function HospitalSearch() {
 
       {isError ? (
         <div className="rounded-lg border border-red-200 bg-red-50 p-10 text-center text-red-700">
-          병원 목록을 불러오지 못했습니다.
+          <p className="font-bold">병원 목록을 불러오지 못했습니다.</p>
+          <p className="mt-2 text-sm">네트워크 상태나 백엔드 API 실행 여부를 확인한 뒤 다시 시도해 주세요.</p>
+          <Button className="mt-5" variant="outline" disabled={isFetching} onClick={() => void refetch()}>
+            다시 불러오기
+          </Button>
         </div>
       ) : null}
 

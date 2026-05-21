@@ -18,10 +18,12 @@ export function HomePage() {
     data: hospitals = [],
     isLoading,
     isError,
+    isFetching,
+    refetch,
   } = useQuery({
     queryKey: ["hospitals"],
     queryFn: hospitalList,
-    retry: 1,
+    retry: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60,
   });
@@ -75,6 +77,15 @@ export function HomePage() {
                 <p className="mt-1 text-xs text-slate-500">평균 예상</p>
               </Card>
             </div>
+            {isError ? (
+              <div className="max-w-xl rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                <p className="font-bold">실시간 병원 정보를 불러오지 못했습니다.</p>
+                <p className="mt-1 text-sm">백엔드 API 연결 상태를 확인한 뒤 다시 시도해 주세요.</p>
+                <Button className="mt-3" variant="outline" disabled={isFetching} onClick={() => void refetch()}>
+                  다시 불러오기
+                </Button>
+              </div>
+            ) : null}
           </div>
 
           <div className="overflow-hidden rounded-lg border border-slate-200 shadow-xl">

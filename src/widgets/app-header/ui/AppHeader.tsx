@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Activity, LogIn, LogOut, UserRound } from "lucide-react";
-import { useEffect, useReducer } from "react";
+import { Activity, LogIn, LogOut, Menu, UserRound, X } from "lucide-react";
+import { useEffect, useReducer, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { logoutMember } from "@/features/auth/api/memberApi";
 import { getMyName } from "@/features/auth/api/myinfoApi";
@@ -18,9 +18,10 @@ const navItems = [
 
 export function AppHeader() {
   const navigate = useNavigate();
-  useLocation();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [, refreshAuth] = useReducer((value: number) => value + 1, 0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isAuthenticated = hasAuthTokens();
 
   useEffect(() => {
@@ -48,6 +49,24 @@ export function AppHeader() {
       navigate(routes.home);
     }
   };
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  const authAction = isAuthenticated ? (
+    <Button variant="ghost" className="justify-start px-3" onClick={handleLogout}>
+      <LogOut className="size-4" aria-hidden="true" />
+      로그아웃
+    </Button>
+  ) : (
+    <NavLink to={routes.login}>
+      <Button variant="ghost" className="justify-start px-3">
+        <LogIn className="size-4" aria-hidden="true" />
+        로그인
+      </Button>
+    </NavLink>
+  );
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -77,28 +96,52 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {isAuthenticated && myName?.name ? <p className="font-bold">{myName.name}님 환영합니다.</p> : null}
-          {isAuthenticated ? (
-            <Button variant="ghost" className="hidden px-3 md:inline-flex" onClick={handleLogout}>
-              <LogOut className="size-4" aria-hidden="true" />
-              로그아웃
-            </Button>
-          ) : (
-            <NavLink to={routes.login}>
-              <Button variant="ghost" className="hidden px-3 md:inline-flex">
-                <LogIn className="size-4" aria-hidden="true" />
-                로그인
-              </Button>
-            </NavLink>
-          )}
+          {isAuthenticated && myName?.name ? (
+            <p className="hidden text-sm font-bold text-slate-700 sm:block">{myName.name}님 환영합니다.</p>
+          ) : null}
+          <div className="hidden md:block">{authAction}</div>
           <NavLink to={routes.hospitalRegister}>
             <Button className="px-3">
               <UserRound className="size-4" aria-hidden="true" />
               접수 시작
             </Button>
           </NavLink>
+          <Button
+            variant="ghost"
+            className="px-3 md:hidden"
+            aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((value) => !value)}
+          >
+            {isMobileMenuOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
+          </Button>
         </div>
       </div>
+
+      {isMobileMenuOpen ? (
+        <nav aria-label="모바일 메뉴" className="border-t border-slate-200 bg-white px-4 py-3 md:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col gap-1">
+            {isAuthenticated && myName?.name ? (
+              <p className="px-3 py-2 text-sm font-bold text-slate-700">{myName.name}님 환영합니다.</p>
+            ) : null}
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-md px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950",
+                    isActive && "bg-slate-100 text-slate-950",
+                  )
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            {authAction}
+          </div>
+        </nav>
+      ) : null}
     </header>
   );
 }
