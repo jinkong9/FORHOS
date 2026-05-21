@@ -1,8 +1,10 @@
-import { AxiosError } from "axios";
-import { Activity, LogIn, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Activity, LogIn, LogOut, UserRound } from "lucide-react";
+import { useEffect, useReducer } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { logoutMember } from "@/features/auth/api/memberApi";
 import { getMyName } from "@/features/auth/api/myinfoApi";
+import { clearAuthTokens, hasAuthTokens, setLogoutHandler } from "@/shared/api/apiClient";
 import { cn } from "@/shared/lib/cn";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
@@ -15,22 +17,37 @@ const navItems = [
 ];
 
 export function AppHeader() {
-  const [myName, setMyName] = useState("");
+  const navigate = useNavigate();
+  useLocation();
+  const queryClient = useQueryClient();
+  const [, refreshAuth] = useReducer((value: number) => value + 1, 0);
+  const isAuthenticated = hasAuthTokens();
 
   useEffect(() => {
-    const handleName = async () => {
-      try {
-        const data = await getMyName();
-        setMyName(data.name);
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          return;
-        }
-      }
-    };
+    setLogoutHandler(() => {
+      queryClient.removeQueries({ queryKey: ["myName"] });
+      refreshAuth();
+      navigate(routes.login);
+    });
+  }, [navigate, queryClient]);
 
-    handleName();
-  }, []);
+  const { data: myName } = useQuery({
+    queryKey: ["myName"],
+    queryFn: getMyName,
+    enabled: isAuthenticated,
+    retry: false,
+  });
+
+  const handleLogout = async () => {
+    try {
+      await logoutMember();
+    } finally {
+      clearAuthTokens();
+      queryClient.removeQueries({ queryKey: ["myName"] });
+      refreshAuth();
+      navigate(routes.home);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -60,13 +77,20 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {myName ? <p className="font-bold">{myName}님 환영합니다.</p> : null}
-          <NavLink to={routes.login}>
-            <Button variant="ghost" className="hidden px-3 md:inline-flex">
-              <LogIn className="size-4" aria-hidden="true" />
-              로그인
+          {isAuthenticated && myName?.name ? <p className="font-bold">{myName.name}님 환영합니다.</p> : null}
+          {isAuthenticated ? (
+            <Button variant="ghost" className="hidden px-3 md:inline-flex" onClick={handleLogout}>
+              <LogOut className="size-4" aria-hidden="true" />
+              로그아웃
             </Button>
-          </NavLink>
+          ) : (
+            <NavLink to={routes.login}>
+              <Button variant="ghost" className="hidden px-3 md:inline-flex">
+                <LogIn className="size-4" aria-hidden="true" />
+                로그인
+              </Button>
+            </NavLink>
+          )}
           <NavLink to={routes.hospitalRegister}>
             <Button className="px-3">
               <UserRound className="size-4" aria-hidden="true" />

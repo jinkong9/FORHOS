@@ -66,6 +66,10 @@ export function clearAuthTokens() {
   cookies.remove(REFRESH_TOKEN_KEY, cookieOptions);
 }
 
+export function hasAuthTokens() {
+  return Boolean(cookies.get<string | undefined>(ACCESS_TOKEN_KEY));
+}
+
 function getAuthorizationHeader() {
   const accessToken = cookies.get<string | undefined>(ACCESS_TOKEN_KEY);
 

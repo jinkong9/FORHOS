@@ -44,3 +44,7 @@ export async function loginMember(request: LoginMemberRequest) {
 
   return data;
 }
+
+export async function logoutMember() {
+  await apiClient.post("/members/logout");
+}

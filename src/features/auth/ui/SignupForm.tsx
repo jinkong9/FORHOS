@@ -52,12 +52,18 @@ export function SignupForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<SignupFormValues> = async ({ passwordConfirm: _passwordConfirm, ...values }) => {
+  const onSubmit: SubmitHandler<SignupFormValues> = async (values) => {
     try {
       setSubmitError("");
       await registerMember({
-        ...values,
+        email: values.email,
+        password: values.password,
+        name: values.name,
         age: Number(values.age),
+        phone: values.phone,
+        gender: values.gender,
+        region: values.region,
+        extra: values.extra,
       });
       navigate(routes.login);
     } catch (error) {
