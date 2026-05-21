@@ -1,7 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock3, Hospital, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/shared/assets/images/hospital-hero.png";
-import { hospitals } from "@/entities/hospital/model/mockHospitals";
+import { hospitalList } from "@/features/auth/api/hospitalListApi";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -13,8 +14,24 @@ const strengths = [
 ];
 
 export function HomePage() {
+  const {
+    data: hospitals = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["hospitals"],
+    queryFn: hospitalList,
+    retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+  });
   const totalWaiting = hospitals.reduce((sum, hospital) => sum + hospital.waitingPeople, 0);
-
+  const hospitalCountLabel = isLoading || isError ? "-" : hospitals.length;
+  const totalWaitingLabel = isLoading || isError ? "-" : totalWaiting;
+  const averageWaitLabel =
+    isLoading || isError || hospitals.length === 0
+      ? "-"
+      : `${Math.round(hospitals.reduce((sum, hospital) => sum + hospital.waitingTime, 0) / hospitals.length)}분`;
 
   return (
     <>
@@ -46,15 +63,15 @@ export function HomePage() {
             </div>
             <div className="grid max-w-xl grid-cols-3 gap-3">
               <Card className="p-4 text-center">
-                <p className="text-2xl font-black text-slate-950">{hospitals.length}</p>
+                <p className="text-2xl font-black text-slate-950">{hospitalCountLabel}</p>
                 <p className="mt-1 text-xs text-slate-500">등록 병원</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-2xl font-black text-slate-950">{totalWaiting}</p>
+                <p className="text-2xl font-black text-slate-950">{totalWaitingLabel}</p>
                 <p className="mt-1 text-xs text-slate-500">총 대기</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-2xl font-black text-slate-950">24분</p>
+                <p className="text-2xl font-black text-slate-950">{averageWaitLabel}</p>
                 <p className="mt-1 text-xs text-slate-500">평균 예상</p>
               </Card>
             </div>

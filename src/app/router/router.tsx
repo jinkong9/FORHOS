@@ -12,6 +12,7 @@ import { QueueInputPage } from "@/pages/queue-input/ui/QueueInputPage";
 import { QueueStatusPage } from "@/pages/queue-status/ui/QueueStatusPage";
 import { SignupPage } from "@/pages/signup/ui/SignupPage";
 import { MyReceptionsPage } from "@/pages/my-receptions/ui/MyReceptionsPage";
+import { ProtectedRoute } from "@/shared/auth/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -20,13 +21,55 @@ export const router = createBrowserRouter([
       { path: routes.home, element: <HomePage /> },
       { path: routes.login, element: <LoginPage /> },
       { path: routes.signup, element: <SignupPage /> },
-      { path: routes.myInfo, element: <MyInfoPage /> },
+      {
+        path: routes.myInfo,
+        element: (
+          <ProtectedRoute>
+            <MyInfoPage />
+          </ProtectedRoute>
+        ),
+      },
       { path: routes.hospitalList, element: <HospitalListPage /> },
-      { path: routes.hospitalRegister, element: <HospitalRegisterPage /> },
-      { path: routes.queueInput, element: <QueueInputPage /> },
-      { path: routes.queueDone, element: <QueueDonePage /> },
-      { path: routes.queueStatus, element: <QueueStatusPage /> },
-      { path: routes.myReceptions, element: <MyReceptionsPage /> },
+      {
+        path: routes.hospitalRegister,
+        element: (
+          <ProtectedRoute>
+            <HospitalRegisterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.queueInput,
+        element: (
+          <ProtectedRoute>
+            <QueueInputPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.queueDone,
+        element: (
+          <ProtectedRoute>
+            <QueueDonePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.queueStatus,
+        element: (
+          <ProtectedRoute>
+            <QueueStatusPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.myReceptions,
+        element: (
+          <ProtectedRoute>
+            <MyReceptionsPage />
+          </ProtectedRoute>
+        ),
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

@@ -62,7 +62,7 @@ export async function getMyReceptions() {
 }
 
 export async function cancelReception(receptionId: number) {
-  const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/cancle`);
+  const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/cancel`);
 
   return data;
 }

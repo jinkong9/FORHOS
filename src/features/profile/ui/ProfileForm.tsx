@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { RotateCcw, Save } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { getMyInfo, updateMyInfo } from "@/features/auth/api/myinfoApi";
@@ -21,6 +22,9 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function ProfileForm() {
+  const queryClient = useQueryClient();
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const {
     register,
     handleSubmit,
@@ -45,6 +49,18 @@ export function ProfileForm() {
     refetchOnWindowFocus: false,
   });
 
+  const updateMyInfoMutation = useMutation({
+    mutationFn: updateMyInfo,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["myInfo"] }),
+        queryClient.invalidateQueries({ queryKey: ["myName"] }),
+      ]);
+      setSubmitError("");
+      setSubmitMessage("내 정보가 저장되었습니다.");
+    },
+  });
+
   useEffect(() => {
     if (!myInfo) {
       return;
@@ -61,16 +77,25 @@ export function ProfileForm() {
   }, [myInfo, reset]);
 
   const onSubmit: SubmitHandler<ProfileFormValues> = async (values) => {
-    await updateMyInfo({
-      name: values.name,
-      age: Number(values.birth),
-      gender: values.gender,
-      phone: values.phone,
-      region: values.region,
-      extra: values.note ?? "",
-    });
+    try {
+      setSubmitMessage("");
+      setSubmitError("");
+      await updateMyInfoMutation.mutateAsync({
+        name: values.name,
+        age: Number(values.birth),
+        gender: values.gender,
+        phone: values.phone,
+        region: values.region,
+        extra: values.note ?? "",
+      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setSubmitError(error.response?.data?.message ?? "내 정보를 저장하지 못했습니다.");
+        return;
+      }
 
-    window.location.reload();
+      setSubmitError("내 정보를 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    }
   };
 
   return (
@@ -111,10 +136,13 @@ export function ProfileForm() {
           />
         </div>
 
+        {submitMessage ? <p className="text-sm font-semibold text-teal-700 md:col-span-2">{submitMessage}</p> : null}
+        {submitError ? <p className="text-sm font-semibold text-red-600 md:col-span-2">{submitError}</p> : null}
+
         <div className="flex items-end gap-3 md:col-span-2">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || updateMyInfoMutation.isPending}>
             <Save className="size-4" aria-hidden="true" />
-            {isSubmitting ? "저장 중..." : "저장하기"}
+            {isSubmitting || updateMyInfoMutation.isPending ? "저장 중..." : "저장하기"}
           </Button>
           <Button variant="outline" type="button" onClick={() => reset()}>
             <RotateCcw className="size-4" aria-hidden="true" />

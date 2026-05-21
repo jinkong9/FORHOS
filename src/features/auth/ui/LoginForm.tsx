@@ -1,16 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { LogIn } from "lucide-react";
+import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { loginMember } from "@/features/auth/api/memberApi";
+import { setAuthTokens } from "@/shared/api/apiClient";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Field } from "@/shared/ui/Field";
-import { useState } from "react";
-import { AxiosError } from "axios";
-import { loginMember } from "../api/memberApi";
-import { setAuthTokens } from "@/shared/api/apiClient";
 
 const loginSchema = z.object({
   email: z.email("올바른 이메일을 입력해 주세요."),
@@ -21,7 +21,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [submitError, setSubmitError] = useState("");
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? routes.hospitalList;
 
   const {
     register,
@@ -36,16 +38,15 @@ export function LoginForm() {
   });
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (values) => {
-    try{
+    try {
       setSubmitError("");
       const tokens = await loginMember(values);
       setAuthTokens(tokens);
-      navigate(routes.hospitalList);
-    } catch(error) {
-      if(error instanceof AxiosError) {
-        setSubmitError(error.response?.data?.message ?? "회원가입에 실패했습니다.");
-        alert(`${submitError}`);
-        return ;
+      navigate(from, { replace: true });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setSubmitError(error.response?.data?.message ?? "로그인에 실패했습니다.");
+        return;
       }
 
       setSubmitError("이메일이나 비밀번호를 확인해주세요.");
