@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { ClipboardCheck } from "lucide-react";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { hospitalList } from "@/features/auth/api/hospitalListApi";
 import { createReception } from "@/features/queue/api/receptionApi";
@@ -29,6 +29,8 @@ const LATEST_RECEPTION_KEY = "latest_reception";
 
 export function QueueCreateForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedHospitalId = searchParams.get("hospitalId") ?? "";
   const [submitError, setSubmitError] = useState("");
   const {
     register,
@@ -37,7 +39,7 @@ export function QueueCreateForm() {
   } = useForm<QueueFormValues>({
     resolver: zodResolver(queueSchema),
     defaultValues: {
-      hospitalId: "",
+      hospitalId: selectedHospitalId,
       patientName: "",
       symptom: "",
       visitType: "FIRST",

@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { BellRing, ClipboardList, ListOrdered } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { getReceptionStatus, type ReceptionQueueStatus, type ReceptionResponse } from "@/features/queue/api/receptionApi";
+import {
+  getLatestReceptionStatus,
+  getReceptionStatus,
+  type ReceptionQueueStatus,
+  type ReceptionResponse,
+} from "@/features/queue/api/receptionApi";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -45,11 +50,7 @@ export function QueueStatusPage() {
   const latestReception = (location.state as QueueStatusLocationState | null)?.reception ?? getStoredReception();
   const receptionId = latestReception?.id;
 
-  const {
-    data: receptionStatus,
-    isLoading,
-    isError,
-  } = useQuery({
+  const statusByIdQuery = useQuery({
     queryKey: ["receptionStatus", receptionId],
     queryFn: () => getReceptionStatus(receptionId!),
     enabled: Boolean(receptionId),
@@ -57,21 +58,18 @@ export function QueueStatusPage() {
     refetchOnWindowFocus: false,
   });
 
-  const progress = receptionStatus ? Math.max(10, Math.min(100, 100 - receptionStatus.waitingCount * 12)) : 10;
+  const latestStatusQuery = useQuery({
+    queryKey: ["latestReceptionStatus"],
+    queryFn: getLatestReceptionStatus,
+    enabled: !receptionId,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
-  if (!receptionId) {
-    return (
-      <section className="mx-auto max-w-3xl px-4 py-12">
-        <Card className="p-8 text-center">
-          <h1 className="text-3xl font-black text-slate-950">대기 현황</h1>
-          <p className="mt-3 text-slate-600">최근 접수 정보가 없습니다. 먼저 병원 접수를 진행해 주세요.</p>
-          <Link className="mt-6 inline-block" to={routes.hospitalList}>
-            <Button>병원 찾기</Button>
-          </Link>
-        </Card>
-      </section>
-    );
-  }
+  const receptionStatus = statusByIdQuery.data ?? latestStatusQuery.data;
+  const isLoading = statusByIdQuery.isLoading || latestStatusQuery.isLoading;
+  const isError = receptionId ? statusByIdQuery.isError : latestStatusQuery.isError;
+  const progress = receptionStatus ? Math.max(10, Math.min(100, 100 - receptionStatus.waitingCount * 12)) : 10;
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-10">
@@ -86,7 +84,7 @@ export function QueueStatusPage() {
       {isError ? (
         <Card className="p-8 text-center">
           <h2 className="text-xl font-black text-slate-950">접수 상태를 불러오지 못했습니다.</h2>
-          <p className="mt-3 text-slate-600">접수 정보가 만료되었거나 본인의 접수가 아닐 수 있습니다.</p>
+          <p className="mt-3 text-slate-600">진행 중인 접수가 없거나 접수 정보를 확인할 수 없습니다.</p>
           <Link className="mt-6 inline-block" to={routes.hospitalList}>
             <Button>병원 찾기</Button>
           </Link>
@@ -125,11 +123,10 @@ export function QueueStatusPage() {
           </div>
 
           <div className="mt-8">
-            {receptionStatus.waitingCount <= 2 ? 
-              <p className="text-xl text-center font-bold">병원에서 대기해주세요</p> :
-              null
-            }
-            <div className="mb-2 flex justify-between text-sm text-slate-600">
+            {receptionStatus.waitingCount <= 2 ? (
+              <p className="text-center text-xl font-bold text-teal-700">병원에서 대기해 주세요.</p>
+            ) : null}
+            <div className="mb-2 mt-4 flex justify-between text-sm text-slate-600">
               <span>호출까지 진행률</span>
               <span>{progress}%</span>
             </div>

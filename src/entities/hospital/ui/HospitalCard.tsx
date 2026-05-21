@@ -11,6 +11,7 @@ type HospitalCardProps = {
 
 export function HospitalCard({ hospital }: HospitalCardProps) {
   const isOpen = hospital.openStatus;
+  const queueInputUrl = `${routes.queueInput}?hospitalId=${hospital.id}`;
 
   return (
     <Card className="overflow-hidden">
@@ -55,7 +56,7 @@ export function HospitalCard({ hospital }: HospitalCardProps) {
         </div>
 
         {isOpen ? (
-          <Link to={routes.queueInput}>
+          <Link to={queueInputUrl}>
             <Button className="w-full">접수하러 가기</Button>
           </Link>
         ) : (
