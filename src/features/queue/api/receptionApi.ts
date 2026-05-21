@@ -55,6 +55,12 @@ export async function getReceptionStatus(receptionId: number) {
   return data;
 }
 
+export async function getLatestReceptionStatus() {
+  const { data } = await apiClient.get<ReceptionStatusResponse>("/reception/me/latest");
+
+  return data;
+}
+
 export async function getMyReceptions() {
   const { data } = await apiClient.get<ReceptionResponse[]>("/reception/me");
 
