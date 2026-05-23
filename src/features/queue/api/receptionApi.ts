@@ -72,3 +72,15 @@ export async function cancelReception(receptionId: number) {
 
   return data;
 }
+
+export async function callReception(receptionId: number) {
+  const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/call`);
+
+  return data;
+}
+
+export async function completeReception(receptionId: number) {
+  const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/complete`);
+
+  return data;
+}

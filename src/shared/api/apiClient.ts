@@ -14,6 +14,8 @@ type AuthTokens = {
   refreshToken: string;
 };
 
+export type MemberRole = "USER" | "HOSPITAL_ADMIN" | "ADMIN";
+
 type RefreshTokenResponse = {
   grantType?: string;
   accessToken?: string;
@@ -68,6 +70,44 @@ export function clearAuthTokens() {
 
 export function hasAuthTokens() {
   return Boolean(cookies.get<string | undefined>(ACCESS_TOKEN_KEY));
+}
+
+function decodeJwtPayload(token: string) {
+  const payload = token.split(".")[1];
+
+  if (!payload) {
+    return null;
+  }
+
+  try {
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, "=");
+
+    return JSON.parse(window.atob(paddedPayload)) as { auth?: string };
+  } catch {
+    return null;
+  }
+}
+
+export function getAuthRoles(): MemberRole[] {
+  const accessToken = cookies.get<string | undefined>(ACCESS_TOKEN_KEY);
+
+  if (!accessToken) {
+    return [];
+  }
+
+  const payload = decodeJwtPayload(accessToken);
+
+  return (payload?.auth ?? "")
+    .split(",")
+    .map((authority) => authority.trim().replace(/^ROLE_/, ""))
+    .filter((role): role is MemberRole => role === "USER" || role === "HOSPITAL_ADMIN" || role === "ADMIN");
+}
+
+export function hasAnyRole(allowedRoles: MemberRole[]) {
+  const currentRoles = getAuthRoles();
+
+  return allowedRoles.some((role) => currentRoles.includes(role));
 }
 
 function getAuthorizationHeader() {

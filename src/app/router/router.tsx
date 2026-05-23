@@ -12,6 +12,7 @@ import { QueueInputPage } from "@/pages/queue-input/ui/QueueInputPage";
 import { QueueStatusPage } from "@/pages/queue-status/ui/QueueStatusPage";
 import { SignupPage } from "@/pages/signup/ui/SignupPage";
 import { MyReceptionsPage } from "@/pages/my-receptions/ui/MyReceptionsPage";
+import { AdminReceptionsPage } from "@/pages/admin-receptions/ui/AdminReceptionsPage";
 import { ProtectedRoute } from "@/shared/auth/ProtectedRoute";
 
 export const router = createBrowserRouter([
@@ -35,6 +36,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <HospitalRegisterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.adminReceptions,
+        element: (
+          <ProtectedRoute allowedRoles={["HOSPITAL_ADMIN", "ADMIN"]}>
+            <AdminReceptionsPage />
           </ProtectedRoute>
         ),
       },

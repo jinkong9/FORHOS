@@ -4,7 +4,7 @@ import { useEffect, useReducer, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { logoutMember } from "@/features/auth/api/memberApi";
 import { getMyName } from "@/features/auth/api/myinfoApi";
-import { clearAuthTokens, hasAuthTokens, setLogoutHandler } from "@/shared/api/apiClient";
+import { clearAuthTokens, hasAnyRole, hasAuthTokens, setLogoutHandler } from "@/shared/api/apiClient";
 import { cn } from "@/shared/lib/cn";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
@@ -23,6 +23,7 @@ export function AppHeader() {
   const [, refreshAuth] = useReducer((value: number) => value + 1, 0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isAuthenticated = hasAuthTokens();
+  const canManageReceptions = isAuthenticated && hasAnyRole(["HOSPITAL_ADMIN", "ADMIN"]);
 
   useEffect(() => {
     setLogoutHandler(() => {
@@ -93,6 +94,19 @@ export function AppHeader() {
               {item.label}
             </NavLink>
           ))}
+          {canManageReceptions ? (
+            <NavLink
+              to={routes.adminReceptions}
+              className={({ isActive }) =>
+                cn(
+                  "rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950",
+                  isActive && "bg-slate-100 text-slate-950",
+                )
+              }
+            >
+              Admin Queue
+            </NavLink>
+          ) : null}
         </nav>
 
         <div className="flex items-center gap-2">
