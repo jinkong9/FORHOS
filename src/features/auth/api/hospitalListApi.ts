@@ -8,3 +8,9 @@ export async function hospitalList() {
 
   return data;
 }
+
+export async function hospitalDetail(hospitalId: number) {
+  const { data } = await apiClient.get<Hospital>(`/hospital/${hospitalId}`);
+
+  return data;
+}

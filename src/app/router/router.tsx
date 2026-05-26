@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "./Layout";
 import { routes } from "@/shared/config/routes";
 import { HomePage } from "@/pages/home/ui/HomePage";
+import { HospitalDetailPage } from "@/pages/hospital-detail/ui/HospitalDetailPage";
 import { HospitalListPage } from "@/pages/hospital-list/ui/HospitalListPage";
 import { HospitalRegisterPage } from "@/pages/hospital-register/ui/HospitalRegisterPage";
 import { LoginPage } from "@/pages/login/ui/LoginPage";
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
         ),
       },
       { path: routes.hospitalList, element: <HospitalListPage /> },
+      { path: routes.hospitalDetail, element: <HospitalDetailPage /> },
       {
         path: routes.hospitalRegister,
         element: (

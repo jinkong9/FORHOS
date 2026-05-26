@@ -4,6 +4,7 @@ export const routes = {
   signup: "/signup",
   myInfo: "/info",
   hospitalList: "/hospital/list",
+  hospitalDetail: "/hospital/:hospitalId",
   hospitalRegister: "/hospital/register",
   adminReceptions: "/admin/receptions",
   queueInput: "/hospital/input",

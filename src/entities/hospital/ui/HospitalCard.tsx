@@ -9,9 +9,14 @@ type HospitalCardProps = {
   hospital: Hospital;
 };
 
+function getHospitalDetailUrl(hospitalId: number) {
+  return routes.hospitalDetail.replace(":hospitalId", hospitalId.toString());
+}
+
 export function HospitalCard({ hospital }: HospitalCardProps) {
   const isOpen = hospital.openStatus;
   const queueInputUrl = `${routes.queueInput}?hospitalId=${hospital.id}`;
+  const detailUrl = getHospitalDetailUrl(hospital.id);
 
   return (
     <Card className="overflow-hidden">
@@ -55,15 +60,22 @@ export function HospitalCard({ hospital }: HospitalCardProps) {
           </div>
         </div>
 
-        {isOpen ? (
-          <Link to={queueInputUrl}>
-            <Button className="w-full">접수하러 가기</Button>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Link to={detailUrl}>
+            <Button className="w-full" variant="outline">
+              상세 보기
+            </Button>
           </Link>
-        ) : (
-          <Button className="w-full" disabled>
-            접수 불가
-          </Button>
-        )}
+          {isOpen ? (
+            <Link to={queueInputUrl}>
+              <Button className="w-full">접수하러 가기</Button>
+            </Link>
+          ) : (
+            <Button className="w-full" disabled>
+              접수 불가
+            </Button>
+          )}
+        </div>
       </div>
     </Card>
   );
