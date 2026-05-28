@@ -3,6 +3,7 @@ export const routes = {
   login: "/login",
   signup: "/signup",
   myInfo: "/info",
+  departmentRecommendation: "/recommendations/departments",
   hospitalList: "/hospital/list",
   hospitalDetail: "/hospital/:hospitalId",
   hospitalRegister: "/hospital/register",

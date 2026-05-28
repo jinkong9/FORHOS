@@ -6,6 +6,11 @@ import { routes } from "@/shared/config/routes";
 import { ProtectedRoute } from "@/shared/auth/ProtectedRoute";
 
 const HomePage = lazy(() => import("@/pages/home/ui/HomePage").then((module) => ({ default: module.HomePage })));
+const DepartmentRecommendationPage = lazy(() =>
+  import("@/pages/department-recommendation/ui/DepartmentRecommendationPage").then((module) => ({
+    default: module.DepartmentRecommendationPage,
+  })),
+);
 const HospitalDetailPage = lazy(() =>
   import("@/pages/hospital-detail/ui/HospitalDetailPage").then((module) => ({ default: module.HospitalDetailPage })),
 );
@@ -69,6 +74,14 @@ export const router = createBrowserRouter([
               <MyInfoPage />
             </PageLoader>
           </ProtectedRoute>
+        ),
+      },
+      {
+        path: routes.departmentRecommendation,
+        element: (
+          <PageLoader>
+            <DepartmentRecommendationPage />
+          </PageLoader>
         ),
       },
       {
