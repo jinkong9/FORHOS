@@ -15,7 +15,7 @@ import { Field, SelectField, TextareaField } from "@/shared/ui/Field";
 
 const queueSchema = z.object({
   hospitalId: z.string().min(1, "병원을 선택해 주세요."),
-  patientName: z.string().min(2, "이름을 2자 이상 입력해 주세요."),
+  patientName: z.string().min(2, "이름은 2자 이상 입력해 주세요."),
   symptom: z.string().min(1, "증상을 입력해 주세요.").max(500, "증상은 500자 이하로 입력해 주세요."),
   visitType: z.enum(["FIRST", "RETURN"]),
 });
@@ -23,6 +23,7 @@ const queueSchema = z.object({
 type QueueFormValues = z.infer<typeof queueSchema>;
 type ApiErrorResponse = {
   message?: string;
+  detail?: string;
 };
 
 const LATEST_RECEPTION_KEY = "latest_reception";
@@ -81,7 +82,7 @@ export function QueueCreateForm() {
       if (error instanceof AxiosError) {
         const errorResponse = error.response?.data as ApiErrorResponse | undefined;
 
-        setSubmitError(errorResponse?.message ?? "접수에 실패했습니다.");
+        setSubmitError(errorResponse?.message ?? errorResponse?.detail ?? "접수에 실패했습니다.");
         return;
       }
 
@@ -111,7 +112,10 @@ export function QueueCreateForm() {
               label: isHospitalLoading ? "병원 목록을 불러오는 중입니다" : "병원을 선택하세요",
               value: "",
             },
-            ...hospitals.map((hospital) => ({ label: hospital.name, value: hospital.id.toString() })),
+            ...hospitals.map((hospital) => ({
+              label: `${hospital.name}${hospital.openStatus ? "" : " (접수마감)"}`,
+              value: hospital.id.toString(),
+            })),
           ]}
           {...register("hospitalId")}
         />

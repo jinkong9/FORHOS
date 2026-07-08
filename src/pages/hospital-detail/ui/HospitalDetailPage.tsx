@@ -1,10 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Building2, Clock, MapPin, Phone, Star, UsersRound } from "lucide-react";
+import { ArrowLeft, Building2, CalendarDays, Clock, MapPin, Phone, Star, UsersRound } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { hospitalDetail } from "@/features/auth/api/hospitalListApi";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+
+function formatTimeRange(start: string | null, end: string | null) {
+  if (!start && !end) {
+    return "미등록";
+  }
+
+  return `${start?.slice(0, 5) ?? "미정"} - ${end?.slice(0, 5) ?? "미정"}`;
+}
 
 export function HospitalDetailPage() {
   const { hospitalId } = useParams();
@@ -30,7 +38,7 @@ export function HospitalDetailPage() {
     return (
       <section className="mx-auto max-w-4xl px-4 py-10">
         <Card className="p-8 text-center">
-          <h1 className="text-2xl font-black text-slate-950">잘못된 병원 주소입니다</h1>
+          <h1 className="text-2xl font-black text-slate-950">잘못된 병원 주소입니다.</h1>
           <p className="mt-3 text-slate-600">병원 목록에서 다시 선택해 주세요.</p>
           <Link className="mt-6 inline-block" to={routes.hospitalList}>
             <Button>병원 목록으로 이동</Button>
@@ -51,7 +59,7 @@ export function HospitalDetailPage() {
 
       {isError ? (
         <Card className="p-8 text-center">
-          <h1 className="text-2xl font-black text-slate-950">병원 정보를 불러오지 못했습니다</h1>
+          <h1 className="text-2xl font-black text-slate-950">병원 정보를 불러오지 못했습니다.</h1>
           <p className="mt-3 text-slate-600">존재하지 않는 병원이거나 서버 응답을 확인할 수 없습니다.</p>
           <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
             <Button variant="outline" onClick={() => void refetch()}>
@@ -85,7 +93,7 @@ export function HospitalDetailPage() {
                   </p>
                 </div>
                 <span className={hospital.openStatus ? "rounded-full bg-teal-100 px-4 py-2 text-sm font-bold text-teal-700" : "rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600"}>
-                  {hospital.openStatus ? "진료중" : "접수마감"}
+                  {hospital.openStatus ? "운영중" : "접수마감"}
                 </span>
               </div>
 
@@ -104,6 +112,24 @@ export function HospitalDetailPage() {
                   <Star className="mb-3 size-6 fill-amber-400 text-amber-400" aria-hidden="true" />
                   <p className="text-sm text-slate-500">평점</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">{hospital.rating.toFixed(1)}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-md border border-slate-200 p-4">
+                  <Clock className="mb-2 size-5 text-teal-700" aria-hidden="true" />
+                  <p className="text-sm font-bold text-slate-900">진료시간</p>
+                  <p className="mt-1 text-sm text-slate-600">{formatTimeRange(hospital.openTime, hospital.closeTime)}</p>
+                </div>
+                <div className="rounded-md border border-slate-200 p-4">
+                  <Clock className="mb-2 size-5 text-teal-700" aria-hidden="true" />
+                  <p className="text-sm font-bold text-slate-900">점심시간</p>
+                  <p className="mt-1 text-sm text-slate-600">{formatTimeRange(hospital.lunchStartTime, hospital.lunchEndTime)}</p>
+                </div>
+                <div className="rounded-md border border-slate-200 p-4">
+                  <CalendarDays className="mb-2 size-5 text-teal-700" aria-hidden="true" />
+                  <p className="text-sm font-bold text-slate-900">휴무일</p>
+                  <p className="mt-1 text-sm text-slate-600">{hospital.closedDays || "미등록"}</p>
                 </div>
               </div>
             </div>

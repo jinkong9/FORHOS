@@ -1,16 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock3, Hospital, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImage from "@/shared/assets/images/hospital-hero.png";
 import { hospitalList } from "@/features/auth/api/hospitalListApi";
+import heroImage from "@/shared/assets/images/hospital-hero.png";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
 const strengths = [
-  { icon: Clock3, title: "실시간 대기 확인", description: "병원별 예상 대기 시간과 접수 가능 상태를 한눈에 확인합니다." },
-  { icon: Hospital, title: "가까운 병원 탐색", description: "진료 과목과 지역을 기준으로 필요한 병원을 빠르게 찾습니다." },
-  { icon: ShieldCheck, title: "방문 정보 관리", description: "초진 정보와 기본 연락처를 미리 입력해 접수 시간을 줄입니다." },
+  {
+    icon: Clock3,
+    title: "실시간 대기 확인",
+    description: "병원별 예상 대기 시간과 접수 가능 상태를 한눈에 확인합니다.",
+  },
+  {
+    icon: Hospital,
+    title: "빠른 병원 탐색",
+    description: "병원명, 주소, 운영 상태와 대기 정보를 기준으로 필요한 병원을 찾습니다.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "방문 정보 관리",
+    description: "기본 정보와 증상을 미리 입력해 접수 시간을 줄입니다.",
+  },
 ];
 
 export function HomePage() {
@@ -27,13 +39,13 @@ export function HomePage() {
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60,
   });
-  const totalWaiting = hospitals.reduce((sum, hospital) => sum + hospital.waitingPeople, 0);
+  const totalWaiting = hospitals.reduce((sum, hospitalItem) => sum + hospitalItem.waitingPeople, 0);
   const hospitalCountLabel = isLoading || isError ? "-" : hospitals.length;
   const totalWaitingLabel = isLoading || isError ? "-" : totalWaiting;
   const averageWaitLabel =
     isLoading || isError || hospitals.length === 0
       ? "-"
-      : `${Math.round(hospitals.reduce((sum, hospital) => sum + hospital.waitingTime, 0) / hospitals.length)}분`;
+      : `${Math.round(hospitals.reduce((sum, hospitalItem) => sum + hospitalItem.waitingTime, 0) / hospitals.length)}분`;
 
   return (
     <>
@@ -46,8 +58,7 @@ export function HomePage() {
                 병원 대기 시간을 보고 접수까지 빠르게
               </h1>
               <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-                FORHOS는 병원 방문 전 대기 현황을 확인하고, 필요한 정보를 미리 등록해 접수 과정을 줄이는
-                프론트엔드 서비스입니다.
+                FORHOS는 병원 방문 전 대기 현황을 확인하고, 필요한 정보를 미리 등록해 접수 과정을 줄이는 서비스입니다.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -89,7 +100,7 @@ export function HomePage() {
           </div>
 
           <div className="overflow-hidden rounded-lg border border-slate-200 shadow-xl">
-            <img className="aspect-[4/3] w-full object-cover" src={heroImage} alt="밝고 차분한 병원 접수 대기 공간" />
+            <img className="aspect-[4/3] w-full object-cover" src={heroImage} alt="병원 접수 대기 공간" />
           </div>
         </div>
       </section>

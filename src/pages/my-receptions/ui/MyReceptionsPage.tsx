@@ -22,6 +22,7 @@ const statusLabel: Record<ReceptionQueueStatus, string> = {
   CALLED: "호출됨",
   COMPLETED: "진료 완료",
   CANCELED: "접수 취소",
+  NO_SHOW: "노쇼",
 };
 
 const statusClassName: Record<ReceptionQueueStatus, string> = {
@@ -29,6 +30,7 @@ const statusClassName: Record<ReceptionQueueStatus, string> = {
   CALLED: "bg-amber-100 text-amber-700",
   COMPLETED: "bg-slate-100 text-slate-700",
   CANCELED: "bg-red-100 text-red-700",
+  NO_SHOW: "bg-orange-100 text-orange-700",
 };
 
 const visitTypeLabel: Record<ReceptionVisitType, string> = {
@@ -151,7 +153,7 @@ export function MyReceptionsPage() {
                       className="text-red-700 hover:bg-red-50"
                     >
                       <XCircle className="size-4" aria-hidden="true" />
-                      {isCanceling ? "취소 중" : "접수 취소"}
+                      {isCanceling ? "취소 중..." : "접수 취소"}
                     </Button>
                   </div>
                 </div>
@@ -159,7 +161,7 @@ export function MyReceptionsPage() {
                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
                   <div className="rounded-lg bg-slate-50 p-4">
                     <ClipboardList className="mb-2 size-5 text-teal-700" aria-hidden="true" />
-                    <p className="text-xs font-semibold text-slate-500">접수 번호</p>
+                    <p className="text-xs font-semibold text-slate-500">접수 ID</p>
                     <p className="mt-1 text-lg font-black text-slate-950">{reception.id}</p>
                   </div>
                   <div className="rounded-lg bg-slate-50 p-4">
@@ -173,10 +175,6 @@ export function MyReceptionsPage() {
                     <p className="mt-1 text-lg font-black text-slate-950">{formatDateTime(reception.queueTime)}</p>
                   </div>
                 </div>
-
-                {reception.canceledTime ? (
-                  <p className="mt-4 text-sm font-semibold text-red-600">취소 시간: {formatDateTime(reception.canceledTime)}</p>
-                ) : null}
               </Card>
             );
           })}

@@ -2,7 +2,15 @@ import { apiClient } from "@/shared/api/apiClient";
 
 export type ReceptionVisitType = "FIRST" | "RETURN";
 
-export type ReceptionQueueStatus = "WAITING" | "CALLED" | "COMPLETED" | "CANCELED";
+export type ReceptionQueueStatus = "WAITING" | "CALLED" | "COMPLETED" | "CANCELED" | "NO_SHOW";
+
+export type ReceptionPageResponse = {
+  content: ReceptionResponse[];
+  number: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+};
 
 export type ReceptionCreateRequest = {
   hospitalId: number;
@@ -49,6 +57,17 @@ export async function getTodayReceptions(hospitalId: number) {
   return data;
 }
 
+export async function getAdminReceptions(params: {
+  date?: string;
+  status?: ReceptionQueueStatus | "";
+  page?: number;
+  size?: number;
+}) {
+  const { data } = await apiClient.get<ReceptionPageResponse>("/admin/receptions", { params });
+
+  return data;
+}
+
 export async function getReceptionStatus(receptionId: number) {
   const { data } = await apiClient.get<ReceptionStatusResponse>(`/reception/hospital/${receptionId}/status`);
 
@@ -81,6 +100,18 @@ export async function callReception(receptionId: number) {
 
 export async function completeReception(receptionId: number) {
   const { data } = await apiClient.patch<ReceptionResponse>(`/reception/${receptionId}/complete`);
+
+  return data;
+}
+
+export async function cancelReceptionByAdmin(receptionId: number) {
+  const { data } = await apiClient.patch<ReceptionResponse>(`/admin/receptions/${receptionId}/cancel`);
+
+  return data;
+}
+
+export async function markNoShowReception(receptionId: number) {
+  const { data } = await apiClient.patch<ReceptionResponse>(`/admin/receptions/${receptionId}/no-show`);
 
   return data;
 }
