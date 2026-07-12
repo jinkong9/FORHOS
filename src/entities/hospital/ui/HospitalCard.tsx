@@ -9,9 +9,30 @@ type HospitalCardProps = {
   hospital: Hospital;
 };
 
+function getHospitalDetailUrl(hospitalId: number) {
+  return routes.hospitalDetail.replace(":hospitalId", hospitalId.toString());
+}
+
+function formatTimeRange(start: string | null, end: string | null) {
+  if (!start && !end) {
+    return "운영시간 미등록";
+  }
+
+  return `${start?.slice(0, 5) ?? "미정"} - ${end?.slice(0, 5) ?? "미정"}`;
+}
+
+function formatClosedDays(closedDays: string | null) {
+  if (!closedDays) {
+    return "휴무일 미등록";
+  }
+
+  return closedDays;
+}
+
 export function HospitalCard({ hospital }: HospitalCardProps) {
   const isOpen = hospital.openStatus;
   const queueInputUrl = `${routes.queueInput}?hospitalId=${hospital.id}`;
+  const detailUrl = getHospitalDetailUrl(hospital.id);
 
   return (
     <Card className="overflow-hidden">
@@ -23,7 +44,7 @@ export function HospitalCard({ hospital }: HospitalCardProps) {
           <div className="mb-2 flex items-center justify-between gap-3">
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">병원</span>
             <span className={isOpen ? "text-sm font-semibold text-teal-700" : "text-sm font-semibold text-slate-500"}>
-              {isOpen ? "진료중" : "접수마감"}
+              {isOpen ? "운영중" : "접수마감"}
             </span>
           </div>
           <h3 className="text-xl font-bold text-slate-950">{hospital.name}</h3>
@@ -32,6 +53,12 @@ export function HospitalCard({ hospital }: HospitalCardProps) {
             {hospital.addr}
           </p>
           <p className="mt-1 text-sm text-slate-500">{hospital.number}</p>
+        </div>
+
+        <div className="rounded-md bg-slate-50 p-3 text-sm text-slate-600">
+          <p className="font-semibold text-slate-800">진료 {formatTimeRange(hospital.openTime, hospital.closeTime)}</p>
+          <p className="mt-1">점심 {formatTimeRange(hospital.lunchStartTime, hospital.lunchEndTime)}</p>
+          <p className="mt-1">휴무 {formatClosedDays(hospital.closedDays)}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-2 rounded-md bg-slate-50 p-3 text-center">
@@ -55,15 +82,22 @@ export function HospitalCard({ hospital }: HospitalCardProps) {
           </div>
         </div>
 
-        {isOpen ? (
-          <Link to={queueInputUrl}>
-            <Button className="w-full">접수하러 가기</Button>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Link to={detailUrl}>
+            <Button className="w-full" variant="outline">
+              상세 보기
+            </Button>
           </Link>
-        ) : (
-          <Button className="w-full" disabled>
-            접수 불가
-          </Button>
-        )}
+          {isOpen ? (
+            <Link to={queueInputUrl}>
+              <Button className="w-full">접수하러 가기</Button>
+            </Link>
+          ) : (
+            <Button className="w-full" disabled>
+              접수 불가
+            </Button>
+          )}
+        </div>
       </div>
     </Card>
   );

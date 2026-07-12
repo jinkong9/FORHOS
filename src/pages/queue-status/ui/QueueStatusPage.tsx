@@ -22,6 +22,7 @@ const statusLabel: Record<ReceptionQueueStatus, string> = {
   CALLED: "호출됨",
   COMPLETED: "진료 완료",
   CANCELED: "접수 취소",
+  NO_SHOW: "노쇼",
 };
 
 const statusMessage: Record<ReceptionQueueStatus, string> = {
@@ -29,6 +30,7 @@ const statusMessage: Record<ReceptionQueueStatus, string> = {
   CALLED: "호출되었습니다. 접수한 병원 안내에 따라 이동해 주세요.",
   COMPLETED: "진료가 완료된 접수입니다.",
   CANCELED: "취소된 접수입니다.",
+  NO_SHOW: "호출 후 방문하지 않아 노쇼 처리된 접수입니다.",
 };
 
 function getStoredReception() {
@@ -107,7 +109,7 @@ export function QueueStatusPage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-lg bg-slate-50 p-5">
               <ClipboardList className="mb-3 size-6 text-teal-700" aria-hidden="true" />
-              <p className="text-sm text-slate-500">접수 번호</p>
+              <p className="text-sm text-slate-500">접수 ID</p>
               <p className="mt-1 text-2xl font-black text-slate-950">{receptionStatus.receptionId}</p>
             </div>
             <div className="rounded-lg bg-slate-50 p-5">
@@ -117,14 +119,14 @@ export function QueueStatusPage() {
             </div>
             <div className="rounded-lg bg-slate-50 p-5">
               <BellRing className="mb-3 size-6 text-teal-700" aria-hidden="true" />
-              <p className="text-sm text-slate-500">내 앞 대기</p>
+              <p className="text-sm text-slate-500">앞 대기</p>
               <p className="mt-1 text-2xl font-black text-slate-950">{receptionStatus.waitingCount}명</p>
             </div>
           </div>
 
           <div className="mt-8">
-            {receptionStatus.waitingCount <= 2 ? (
-              <p className="text-center text-xl font-bold text-teal-700">병원에서 대기해 주세요.</p>
+            {receptionStatus.waitingCount <= 2 && receptionStatus.status === "WAITING" ? (
+              <p className="text-center text-xl font-bold text-teal-700">병원 근처에서 대기해 주세요.</p>
             ) : null}
             <div className="mb-2 mt-4 flex justify-between text-sm text-slate-600">
               <span>호출까지 진행률</span>

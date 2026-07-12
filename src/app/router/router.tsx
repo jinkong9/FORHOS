@@ -1,41 +1,112 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy } from "react";
 import { Layout } from "./Layout";
+import { PageLoader } from "./PageLoader";
 import { routes } from "@/shared/config/routes";
-import { HomePage } from "@/pages/home/ui/HomePage";
-import { HospitalListPage } from "@/pages/hospital-list/ui/HospitalListPage";
-import { HospitalRegisterPage } from "@/pages/hospital-register/ui/HospitalRegisterPage";
-import { LoginPage } from "@/pages/login/ui/LoginPage";
-import { MyInfoPage } from "@/pages/my-info/ui/MyInfoPage";
-import { NotFoundPage } from "@/pages/not-found/ui/NotFoundPage";
-import { QueueDonePage } from "@/pages/queue-done/ui/QueueDonePage";
-import { QueueInputPage } from "@/pages/queue-input/ui/QueueInputPage";
-import { QueueStatusPage } from "@/pages/queue-status/ui/QueueStatusPage";
-import { SignupPage } from "@/pages/signup/ui/SignupPage";
-import { MyReceptionsPage } from "@/pages/my-receptions/ui/MyReceptionsPage";
-import { AdminReceptionsPage } from "@/pages/admin-receptions/ui/AdminReceptionsPage";
 import { ProtectedRoute } from "@/shared/auth/ProtectedRoute";
+
+const HomePage = lazy(() => import("@/pages/home/ui/HomePage").then((module) => ({ default: module.HomePage })));
+const DepartmentRecommendationPage = lazy(() =>
+  import("@/pages/department-recommendation/ui/DepartmentRecommendationPage").then((module) => ({
+    default: module.DepartmentRecommendationPage,
+  })),
+);
+const HospitalDetailPage = lazy(() =>
+  import("@/pages/hospital-detail/ui/HospitalDetailPage").then((module) => ({ default: module.HospitalDetailPage })),
+);
+const HospitalListPage = lazy(() =>
+  import("@/pages/hospital-list/ui/HospitalListPage").then((module) => ({ default: module.HospitalListPage })),
+);
+const HospitalRegisterPage = lazy(() =>
+  import("@/pages/hospital-register/ui/HospitalRegisterPage").then((module) => ({ default: module.HospitalRegisterPage })),
+);
+const LoginPage = lazy(() => import("@/pages/login/ui/LoginPage").then((module) => ({ default: module.LoginPage })));
+const MyInfoPage = lazy(() => import("@/pages/my-info/ui/MyInfoPage").then((module) => ({ default: module.MyInfoPage })));
+const NotFoundPage = lazy(() => import("@/pages/not-found/ui/NotFoundPage").then((module) => ({ default: module.NotFoundPage })));
+const QueueDonePage = lazy(() => import("@/pages/queue-done/ui/QueueDonePage").then((module) => ({ default: module.QueueDonePage })));
+const QueueInputPage = lazy(() =>
+  import("@/pages/queue-input/ui/QueueInputPage").then((module) => ({ default: module.QueueInputPage })),
+);
+const QueueStatusPage = lazy(() =>
+  import("@/pages/queue-status/ui/QueueStatusPage").then((module) => ({ default: module.QueueStatusPage })),
+);
+const SignupPage = lazy(() => import("@/pages/signup/ui/SignupPage").then((module) => ({ default: module.SignupPage })));
+const MyReceptionsPage = lazy(() =>
+  import("@/pages/my-receptions/ui/MyReceptionsPage").then((module) => ({ default: module.MyReceptionsPage })),
+);
+const AdminReceptionsPage = lazy(() =>
+  import("@/pages/admin-receptions/ui/AdminReceptionsPage").then((module) => ({ default: module.AdminReceptionsPage })),
+);
 
 export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      { path: routes.home, element: <HomePage /> },
-      { path: routes.login, element: <LoginPage /> },
-      { path: routes.signup, element: <SignupPage /> },
+      {
+        path: routes.home,
+        element: (
+          <PageLoader>
+            <HomePage />
+          </PageLoader>
+        ),
+      },
+      {
+        path: routes.login,
+        element: (
+          <PageLoader>
+            <LoginPage />
+          </PageLoader>
+        ),
+      },
+      {
+        path: routes.signup,
+        element: (
+          <PageLoader>
+            <SignupPage />
+          </PageLoader>
+        ),
+      },
       {
         path: routes.myInfo,
         element: (
           <ProtectedRoute>
-            <MyInfoPage />
+            <PageLoader>
+              <MyInfoPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
-      { path: routes.hospitalList, element: <HospitalListPage /> },
+      {
+        path: routes.departmentRecommendation,
+        element: (
+          <PageLoader>
+            <DepartmentRecommendationPage />
+          </PageLoader>
+        ),
+      },
+      {
+        path: routes.hospitalList,
+        element: (
+          <PageLoader>
+            <HospitalListPage />
+          </PageLoader>
+        ),
+      },
+      {
+        path: routes.hospitalDetail,
+        element: (
+          <PageLoader>
+            <HospitalDetailPage />
+          </PageLoader>
+        ),
+      },
       {
         path: routes.hospitalRegister,
         element: (
           <ProtectedRoute>
-            <HospitalRegisterPage />
+            <PageLoader>
+              <HospitalRegisterPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
@@ -43,7 +114,9 @@ export const router = createBrowserRouter([
         path: routes.adminReceptions,
         element: (
           <ProtectedRoute allowedRoles={["HOSPITAL_ADMIN", "ADMIN"]}>
-            <AdminReceptionsPage />
+            <PageLoader>
+              <AdminReceptionsPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
@@ -51,7 +124,9 @@ export const router = createBrowserRouter([
         path: routes.queueInput,
         element: (
           <ProtectedRoute>
-            <QueueInputPage />
+            <PageLoader>
+              <QueueInputPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
@@ -59,7 +134,9 @@ export const router = createBrowserRouter([
         path: routes.queueDone,
         element: (
           <ProtectedRoute>
-            <QueueDonePage />
+            <PageLoader>
+              <QueueDonePage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
@@ -67,7 +144,9 @@ export const router = createBrowserRouter([
         path: routes.queueStatus,
         element: (
           <ProtectedRoute>
-            <QueueStatusPage />
+            <PageLoader>
+              <QueueStatusPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
@@ -75,11 +154,20 @@ export const router = createBrowserRouter([
         path: routes.myReceptions,
         element: (
           <ProtectedRoute>
-            <MyReceptionsPage />
+            <PageLoader>
+              <MyReceptionsPage />
+            </PageLoader>
           </ProtectedRoute>
         ),
       },
-      { path: "*", element: <NotFoundPage /> },
+      {
+        path: "*",
+        element: (
+          <PageLoader>
+            <NotFoundPage />
+          </PageLoader>
+        ),
+      },
     ],
   },
 ]);

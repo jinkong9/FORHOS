@@ -6,13 +6,25 @@ const mockHospitals = [
     name: "FORHOS Clinic",
     addr: "Seoul",
     number: "02-1234-5678",
-    subject: "Internal Medicine",
+    openStatus: true,
+    openTime: "09:00:00",
+    closeTime: "18:00:00",
+    lunchStartTime: "12:30:00",
+    lunchEndTime: "13:30:00",
+    closedDays: "SUNDAY",
     waitingPeople: 3,
     waitingTime: 12,
     rating: 4.8,
-    openStatus: true,
   },
 ];
+
+const mockHospitalPage = {
+  content: mockHospitals,
+  number: 0,
+  size: 9,
+  totalElements: 1,
+  totalPages: 1,
+};
 
 const mockReception = {
   id: 7,
@@ -64,6 +76,14 @@ test.beforeEach(async ({ page }) => {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(mockHospitals),
+    });
+  });
+
+  await page.route("**/api/hospital?**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockHospitalPage),
     });
   });
 
@@ -238,12 +258,29 @@ test("shows my receptions and cancels a waiting reception", async ({ context, pa
 test("lets hospital admins call a waiting reception", async ({ context, page }) => {
   let callRequested = false;
 
+<<<<<<< HEAD
   await signIn(context, "ROLE_HOSPITAL_ADMIN");
   await page.route("**/api/reception/hospital/1/today", async (route) => {
+=======
+  await context.addCookies([
+    {
+      name: "access_token",
+      value: createAccessToken("ROLE_HOSPITAL_ADMIN"),
+      url: "http://127.0.0.1:4173",
+    },
+  ]);
+  await page.route("**/api/admin/receptions?**", async (route) => {
+>>>>>>> f3d64b77ccdc3902980d9af32ea680d5b6be4b44
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify([mockReception]),
+      body: JSON.stringify({
+        content: [mockReception],
+        number: 0,
+        size: 10,
+        totalElements: 1,
+        totalPages: 1,
+      }),
     });
   });
   await page.route("**/api/reception/7/call", async (route) => {
@@ -255,11 +292,11 @@ test("lets hospital admins call a waiting reception", async ({ context, page }) 
     });
   });
 
-  await page.goto("/admin/receptions?hospitalId=1");
-  await expect(page.getByText("Reception Management")).toBeVisible();
+  await page.goto("/admin/receptions");
+  await expect(page.getByRole("heading", { name: "접수 관리" })).toBeVisible();
   await expect(page.getByText("Alex Kim")).toBeVisible();
 
-  await page.getByRole("button", { name: "Call" }).click();
+  await page.getByRole("button", { name: "호출" }).click();
 
   await expect.poll(() => callRequested).toBe(true);
 });
