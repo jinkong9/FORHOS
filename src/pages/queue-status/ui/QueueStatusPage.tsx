@@ -13,6 +13,10 @@ import { Card } from "@/shared/ui/Card";
 
 type QueueStatusLocationState = {
   reception?: ReceptionResponse;
+  asyncRequest?: {
+    requestId: string;
+    status: "ACCEPTED";
+  };
 };
 
 const LATEST_RECEPTION_KEY = "latest_reception";
@@ -49,7 +53,9 @@ function getStoredReception() {
 
 export function QueueStatusPage() {
   const location = useLocation();
-  const latestReception = (location.state as QueueStatusLocationState | null)?.reception ?? getStoredReception();
+  const locationState = location.state as QueueStatusLocationState | null;
+  const latestReception = locationState?.reception ?? getStoredReception();
+  const asyncRequest = locationState?.asyncRequest;
   const receptionId = latestReception?.id;
 
   const statusByIdQuery = useQuery({
@@ -61,16 +67,18 @@ export function QueueStatusPage() {
   });
 
   const latestStatusQuery = useQuery({
-    queryKey: ["latestReceptionStatus"],
+    queryKey: ["latestReceptionStatus", asyncRequest?.requestId],
     queryFn: getLatestReceptionStatus,
     enabled: !receptionId,
-    retry: 1,
+    retry: asyncRequest ? false : 1,
+    refetchInterval: (query) => (asyncRequest && !query.state.data ? 2000 : false),
     refetchOnWindowFocus: false,
   });
 
   const receptionStatus = statusByIdQuery.data ?? latestStatusQuery.data;
   const isLoading = statusByIdQuery.isLoading || latestStatusQuery.isLoading;
-  const isError = receptionId ? statusByIdQuery.isError : latestStatusQuery.isError;
+  const isAsyncPending = Boolean(asyncRequest && !receptionStatus);
+  const isError = receptionId ? statusByIdQuery.isError : latestStatusQuery.isError && !isAsyncPending;
   const progress = receptionStatus ? Math.max(10, Math.min(100, 100 - receptionStatus.waitingCount * 12)) : 10;
 
   return (
@@ -82,6 +90,16 @@ export function QueueStatusPage() {
       </div>
 
       {isLoading ? <Card className="p-8 text-center text-slate-600">대기 현황을 불러오는 중입니다.</Card> : null}
+
+      {!isLoading && isAsyncPending ? (
+        <Card className="p-8 text-center">
+          <h2 className="text-xl font-black text-slate-950">비동기 접수 요청을 처리 중입니다</h2>
+          <p className="mt-3 text-slate-600">
+            RabbitMQ Queue에 접수 요청이 등록되었습니다. 실제 접수 생성이 완료되면 대기 현황이 자동으로 표시됩니다.
+          </p>
+          <p className="mt-4 text-sm font-semibold text-teal-700">requestId: {asyncRequest?.requestId}</p>
+        </Card>
+      ) : null}
 
       {isError ? (
         <Card className="p-8 text-center">

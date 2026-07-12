@@ -19,6 +19,11 @@ export type ReceptionCreateRequest = {
   symptom: string;
 };
 
+export type ReceptionAsyncResponse = {
+  requestId: string;
+  status: "ACCEPTED";
+};
+
 export type ReceptionResponse = {
   id: number;
   memberId: number;
@@ -47,6 +52,12 @@ export type ReceptionStatusResponse = {
 
 export async function createReception(request: ReceptionCreateRequest) {
   const { data } = await apiClient.post<ReceptionResponse>("/reception", request);
+
+  return data;
+}
+
+export async function createReceptionAsync(request: ReceptionCreateRequest) {
+  const { data } = await apiClient.post<ReceptionAsyncResponse>("/reception/async", request);
 
   return data;
 }

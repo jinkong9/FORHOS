@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { hospitalList } from "@/features/auth/api/hospitalListApi";
-import { createReception } from "@/features/queue/api/receptionApi";
+import { createReception, createReceptionAsync } from "@/features/queue/api/receptionApi";
 import { routes } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -18,6 +18,7 @@ const queueSchema = z.object({
   patientName: z.string().min(2, "이름은 2자 이상 입력해 주세요."),
   symptom: z.string().min(1, "증상을 입력해 주세요.").max(500, "증상은 500자 이하로 입력해 주세요."),
   visitType: z.enum(["FIRST", "RETURN"]),
+  asyncReception: z.boolean(),
 });
 
 type QueueFormValues = z.infer<typeof queueSchema>;
@@ -44,6 +45,7 @@ export function QueueCreateForm() {
       patientName: "",
       symptom: "",
       visitType: "FIRST",
+      asyncReception: false,
     },
   });
 
@@ -69,15 +71,37 @@ export function QueueCreateForm() {
     },
   });
 
+  const createReceptionAsyncMutation = useMutation({
+    mutationFn: createReceptionAsync,
+    onSuccess: (response) => {
+      sessionStorage.removeItem(LATEST_RECEPTION_KEY);
+      navigate(routes.queueStatus, {
+        state: {
+          asyncRequest: {
+            requestId: response.requestId,
+            status: response.status,
+          },
+        },
+      });
+    },
+  });
+
   const onSubmit: SubmitHandler<QueueFormValues> = async (values) => {
     try {
       setSubmitError("");
-      await createReceptionMutation.mutateAsync({
+      const request = {
         hospitalId: Number(values.hospitalId),
         patientName: values.patientName,
         visitType: values.visitType,
         symptom: values.symptom,
-      });
+      };
+
+      if (values.asyncReception) {
+        await createReceptionAsyncMutation.mutateAsync(request);
+        return;
+      }
+
+      await createReceptionMutation.mutateAsync(request);
     } catch (error) {
       if (error instanceof AxiosError) {
         const errorResponse = error.response?.data as ApiErrorResponse | undefined;
@@ -136,9 +160,28 @@ export function QueueCreateForm() {
           error={errors.symptom?.message}
           {...register("symptom")}
         />
+        <label className="flex items-start gap-3 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+          <input className="mt-1 size-4 accent-teal-700" type="checkbox" {...register("asyncReception")} />
+          <span>
+            <span className="block font-bold text-slate-900">RabbitMQ 비동기 접수로 요청하기</span>
+            <span className="mt-1 block text-slate-600">
+              요청을 Queue에 넣고 바로 상태 화면으로 이동합니다. 실제 접수 완료까지 잠시 걸릴 수 있습니다.
+            </span>
+          </span>
+        </label>
         {submitError ? <p className="text-sm font-semibold text-red-600">{submitError}</p> : null}
-        <Button className="w-full" type="submit" disabled={isSubmitting || createReceptionMutation.isPending || isHospitalLoading || isHospitalError}>
-          {createReceptionMutation.isPending ? "접수 중..." : "접수 완료하기"}
+        <Button
+          className="w-full"
+          type="submit"
+          disabled={
+            isSubmitting ||
+            createReceptionMutation.isPending ||
+            createReceptionAsyncMutation.isPending ||
+            isHospitalLoading ||
+            isHospitalError
+          }
+        >
+          {createReceptionMutation.isPending || createReceptionAsyncMutation.isPending ? "접수 중..." : "접수 완료하기"}
         </Button>
       </form>
     </Card>
